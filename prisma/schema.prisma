@@ -3,7 +3,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -71,14 +70,23 @@ enum VideoStatus {
   FAILED
 }
 
+enum VideoPrivacy {
+  PUBLIC
+  PRIVATE
+}
+
 model Video {
   id                String      @id @default(cuid())
   userId            String
   title             String
   description       String?
+  category          String?
+  privacy           VideoPrivacy @default(PUBLIC)
   originalFilePath  String
   hlsManifestPath   String?
   thumbnailPath     String?
+  duration          Int         @default(0)
+  file_size         Int         @default(0)
   status            VideoStatus @default(PENDING)
   progressPercent   Int         @default(0)
   errorMessage      String?

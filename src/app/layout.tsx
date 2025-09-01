@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
-import { auth } from "@/lib/auth";
+import { Providers } from "@/components/Providers";
+
 export const dynamic = "force-dynamic";
 
 const geistSans = Geist({
@@ -25,29 +25,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth();
+  
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <header className="border-b">
-          <div className="max-w-5xl mx-auto p-4 flex items-center justify-between">
-            <Link href="/" className="font-semibold">Video CMS</Link>
-            <nav className="flex items-center gap-4">
-              <Link href="/dashboard">Dashboard</Link>
-              <Link href="/upload">Upload</Link>
-              {session?.user ? (
-                <form action="/api/auth/signout" method="post">
-                  <button className="underline">Sign out</button>
-                </form>
-              ) : (
-                <Link href="/login">Login</Link>
-              )}
-            </nav>
+        <Providers>
+          <div className="mx-auto">
+            {children}
           </div>
-        </header>
-        <main className="max-w-5xl mx-auto">
-          {children}
-        </main>
+        </Providers>
       </body>
     </html>
   );

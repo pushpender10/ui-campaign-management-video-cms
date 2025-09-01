@@ -1,35 +1,24 @@
 import NextAuth from "next-auth"
+import { authOptions } from "./server/next-auth-config"
 
-import { PrismaAdapter } from "@auth/prisma-adapter"
-// import { PrismaClient } from "@prisma/client"
-import authConfig from "./auth.config"
-
-// const prisma = new PrismaClient()
-
-import { prisma } from "./prisma";
-
-export const { auth, handlers, signIn, signOut } = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  session: { strategy: "jwt" },
-  ...authConfig,
-  callbacks: {
-    // async signIn({ account, profile }) {
-    //   if (account.provider === "google") {
-    //     return profile.email_verified && profile.email.endsWith("@example.com")
-    //   }
-    //   return true // Do different verification for other providers that don't have `email_verified`
-    // },
-    async session({ session, token, user }) {
-      if (session.user && token.sub) {
-        (session.user as any).id = token.sub;
+export const { handlers, signIn, signOut, auth } = NextAuth({
+    ...authOptions,
+    callbacks: {
+        async jwt({ token, user }) {
+          if (user) {
+            token.id = user.id;
+            (token as any).username = (user as any).username;
+          }
+          return token;
+        },
+        async session({ session, token }) {
+          if (token) {
+            session.user.id = token.id as string;
+            (session.user as any).username = (token as any).username as string;
+          }
+          return session;
+        }
       }
-      return session;
-    },
-  },
-  pages: {
-    signIn: "/login",
-  },
-  secret: process.env.NEXTAUTH_SECRET,
 });
 
 

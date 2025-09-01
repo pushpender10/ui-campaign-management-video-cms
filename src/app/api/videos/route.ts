@@ -1,15 +1,35 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/server/database";
 import { z } from "zod";
 import path from "node:path";
 import fs from "node:fs/promises";
 
 const uploadDir = process.env.UPLOAD_DIR ?? path.join(process.cwd(), "storage", "uploads");
 
+// privacy options
+const privacyOptions = ["PUBLIC", "PRIVATE"] as const;
+
+// video status options
+const videoStatus = [
+  "PENDING",
+  "PROCESSING",
+  "READY",
+  "FAILED"
+] as const;
+
 const bodySchema = z.object({
   title: z.string().min(1),
   description: z.string().optional().nullable(),
+  category:z.string().optional().nullable(),
+  privacy:z.enum(privacyOptions),
+  hlsManifestPath:z.string().optional().nullable(),
+  thumbnailPath:z.string().optional().nullable(),
+  duration:z.number(),
+  file_size:z.number(),
+  status:z.enum(videoStatus),
+  progressPercent:z.number(),
+  errorMessage:z.string().optional().nullable(),
   campaignStartDate: z.string(),
   campaignEndDate: z.string(),
 });
@@ -32,18 +52,25 @@ export async function POST(req: Request) {
   await fs.mkdir(uploadDir, { recursive: true });
   await fs.writeFile(filePath, buffer);
 
-  const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+  const user = await db.user.findByEmail(session.user.email);
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 400 });
 
-  const video = await prisma.video.create({
-    data: {
-      userId: user.id,
-      title: parsed.data.title,
-      description: parsed.data.description ?? undefined,
-      originalFilePath: filePath,
-      campaignStartDate: new Date(parsed.data.campaignStartDate),
-      campaignEndDate: new Date(parsed.data.campaignEndDate),
-    },
+  const video = await db.video.create({
+    userId: user.id,
+    title: parsed.data.title,
+    description: parsed.data.description ?? undefined,
+    category:parsed.data.category ?? undefined,
+    privacy:parsed.data.privacy,
+    originalFilePath: filePath,
+    hlsManifestPath:parsed.data.hlsManifestPath ?? undefined,
+    thumbnailPath:parsed.data.thumbnailPath ?? undefined,
+    duration:parsed.data.duration,
+    file_size:parsed.data.file_size,
+    status:parsed.data.status,
+    progressPercent:parsed.data.progressPercent,
+    errorMessage:parsed.data.errorMessage ?? undefined,
+    campaignStartDate: new Date(parsed.data.campaignStartDate),
+    campaignEndDate: new Date(parsed.data.campaignEndDate),
   });
 
   // Kick off background transcoding via a separate route (SSE status elsewhere)

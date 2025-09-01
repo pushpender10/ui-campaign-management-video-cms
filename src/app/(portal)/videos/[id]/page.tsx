@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/server/database";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import VideoStatus from "@/components/VideoStatus";
@@ -7,7 +7,7 @@ import HlsPlayer from "@/components/HlsPlayer";
 
 export default async function VideoDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const video = await prisma.video.findUnique({ where: { id } });
+  const video = await db.video.findById(id);
   if (!video) return notFound();
   const canPlay = video.status === "READY" && video.hlsManifestPath;
 

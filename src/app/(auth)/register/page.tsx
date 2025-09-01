@@ -14,6 +14,7 @@ export default function RegisterPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    console.log({name, email, username, password})
     const res = await fetch("/api/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, username, password }) });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));

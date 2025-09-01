@@ -38,7 +38,7 @@ npx prisma studio
 - Copy `.env` and configure required environment variables:
   - `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` for Google OAuth
   - `NEXTAUTH_URL` (defaults to http://localhost:3000)
-  - `NEXTAUTH_SECRET` for session encryption
+  - `AUTH_SECRET` for session encryption
   - `DATABASE_URL` for SQLite database (defaults to `file:./prisma/dev.db`)
 
 ## Architecture Overview

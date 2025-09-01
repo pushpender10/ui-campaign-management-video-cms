@@ -1,8 +1,8 @@
 "use client";
-export const dynamic = "force-dynamic";
-import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { GoogleSignIn } from "@/components/sign-in";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,15 +13,21 @@ export default function LoginPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const res = await signIn("credentials", {
-      identifier,
-      password,
-      redirect: false,
-    });
-    if (res?.ok) {
-      router.push("/dashboard");
-    } else {
-      setError("Invalid credentials");
+    
+    try {
+      const result = await signIn("credentials", {
+        email: identifier,
+        password: password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("Invalid credentials");
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      setError("An error occurred during login");
     }
   }
 
@@ -48,6 +54,7 @@ export default function LoginPage() {
           <button className="w-full bg-black text-white rounded py-2">Sign in</button>
         </form>
         <div className="mt-4 space-y-2">
+          {/* <GoogleSignIn callbackUrl="/dashboard" /> */}
           <button
             className="w-full border rounded py-2"
             onClick={() => signIn("google", { callbackUrl: "/dashboard" })}

@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/server/database";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
@@ -14,14 +14,9 @@ export default async function DashboardPage() {
     );
   }
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-  });
+  const user = await db.user.findByEmail(session.user.email);
 
-  const videos = await prisma.video.findMany({
-    where: { userId: user?.id },
-    orderBy: { createdAt: "desc" },
-  });
+  const videos = await db.video.findByUserId(user?.id || '');
 
   return (
     <div className="p-6 space-y-4">
@@ -30,7 +25,7 @@ export default async function DashboardPage() {
         <Link href="/upload" className="underline">Upload new</Link>
       </div>
       <ul className="space-y-2">
-        {videos.map((v) => (
+        {videos.map((v: any) => (
           <li key={v.id} className="border rounded p-3 flex items-center justify-between">
             <div>
               <p className="font-medium">{v.title}</p>

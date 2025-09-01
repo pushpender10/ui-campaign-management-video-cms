@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { db } from "@/lib/server/database";
 
 export async function GET(_: Request, { params }: any) {
   const encoder = new TextEncoder();
@@ -7,7 +7,7 @@ export async function GET(_: Request, { params }: any) {
     start: async (controller) => {
       async function send() {
         if (isClosed) return;
-        const v = await prisma.video.findUnique({ where: { id: params.id } });
+        const v = await db.video.findById(params.id);
         if (!v) {
           controller.enqueue(encoder.encode(`event: end\ndata: {"error":"not_found"}\n\n`));
           controller.close();
