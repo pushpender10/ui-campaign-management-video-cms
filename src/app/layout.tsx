@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Providers } from "@/components/Providers";
+import { NextAuthProvider } from "@/components/NextAuthProvider";
+// import { auth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -26,15 +27,16 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   
+  // const session = await auth();
 
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Providers>
+        <NextAuthProvider>
           <div className="mx-auto">
             {children}
           </div>
-        </Providers>
+        </NextAuthProvider>
       </body>
     </html>
   );

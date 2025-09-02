@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { GoogleSignIn } from "@/components/sign-in";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,7 +12,7 @@ export default function LoginPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    
+
     try {
       const result = await signIn("credentials", {
         email: identifier,
@@ -51,21 +50,25 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
           {error && <p className="text-red-600 text-sm">{error}</p>}
-          <button className="w-full bg-black text-white rounded py-2">Sign in</button>
+          <button className="w-full bg-black text-white rounded py-2">
+            Sign in
+          </button>
         </form>
         <div className="mt-4 space-y-2">
-          {/* <GoogleSignIn callbackUrl="/portal" /> */}
           <button
             className="w-full border rounded py-2"
             onClick={() => signIn("google", { callbackUrl: "/portal" })}
           >
             Continue with Google
           </button>
-          <button className="w-full underline" onClick={() => router.push("/register")}>Create an account</button>
+          <button
+            className="w-full underline"
+            onClick={() => router.push("/register")}
+          >
+            Create an account
+          </button>
         </div>
       </div>
     </div>
   );
 }
-
-
