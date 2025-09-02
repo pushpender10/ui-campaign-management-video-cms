@@ -1,11 +1,21 @@
 import { db } from "@/lib/server/database";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import VideoStatus from "@/components/VideoStatus";
 export const dynamic = "force-dynamic";
 import HlsPlayer from "@/components/HlsPlayer";
+import { auth } from "@/lib/auth";
 
 export default async function VideoDetail({ params }: { params: Promise<{ id: string }> }) {
+
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return (
+      redirect('/login')
+    );
+  }
+
   const { id } = await params;
   const video = await db.video.findById(id);
   if (!video) return notFound();
@@ -13,7 +23,7 @@ export default async function VideoDetail({ params }: { params: Promise<{ id: st
 
   return (
     <div className="p-6 space-y-4">
-      <Link href="/dashboard" className="underline">← Back</Link>
+      <Link href="/portal" className="underline">← Back</Link>
       <h1 className="text-2xl font-semibold">{video.title}</h1>
       <p className="text-gray-600">{video.description}</p>
       <p className="text-sm text-gray-500">Campaign: {video.campaignStartDate.toISOString().slice(0,10)} → {video.campaignEndDate.toISOString().slice(0,10)}</p>

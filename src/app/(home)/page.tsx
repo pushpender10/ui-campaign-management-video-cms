@@ -24,12 +24,20 @@ export default function Home() {
           campaigns with ease. Get real-time insights and streamline your
           content workflow.
         </p>
+        <div className="relative w-full h-64 md:h-96 rounded-2xl overflow-hidden shadow-md">
+          <Image
+            src="/preview.jpg"
+            alt="Video CMS preview"
+            fill
+            className="object-cover"
+          />
+        </div>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button size="lg" className="px-8 py-6 text-lg">
+          {/* <Button size="lg" className="px-8 py-6 text-lg">
             Get Started
-          </Button>
+          </Button> */}
           <Button
-            variant="outline"
+            // variant="outline"
             size="lg"
             className="px-8 py-6 text-lg flex items-center gap-2"
           >
@@ -75,14 +83,7 @@ export default function Home() {
       {/* Preview / Placeholder Section */}
       <section className="max-w-6xl mx-auto px-6 py-20 text-center">
         <h2 className="text-3xl font-bold mb-6">Campaign Preview</h2>
-        <div className="relative w-full h-64 md:h-96 rounded-2xl overflow-hidden shadow-md">
-          <Image
-            src="/preview.jpg"
-            alt="Video CMS preview"
-            fill
-            className="object-cover"
-          />
-        </div>
+        
       </section>
 
       {/* Call to Action */}

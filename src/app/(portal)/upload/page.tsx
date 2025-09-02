@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import React, { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,8 +12,16 @@ import { ArrowLeft, Upload as UploadIcon, X, Plus, Video as VideoIcon, Image, Sp
 import { useVideos } from "@/hooks/useVideos";
 import { VIDEO_CATEGORIES, VIDEO_PRIVACY_OPTIONS } from "@/lib/shared/constants";
 import { validateVideoFile } from "@/lib/client/utils";
+import { useSession } from "next-auth/react";
 
 export default function UploadPage() {
+  const { data: session, status } = useSession();
+  if (status !== 'authenticated') {
+    return (
+      redirect('/login')
+    )
+  }
+  
   const router = useRouter();
   const { uploadVideo } = useVideos();
   

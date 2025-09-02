@@ -22,7 +22,7 @@ export default function PortalHeader() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [
-    { name: "Portal VCMS", href: "/dashboard" },
+    { name: "Portal VCMS", href: "/portal" },
     { name: "Campaigns", href: "/campaigns" },
     { name: "Analytics", href: "/analytics" },
     { name: "Upload", href: "/upload" },

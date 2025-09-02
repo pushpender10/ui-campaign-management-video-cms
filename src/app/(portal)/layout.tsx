@@ -27,8 +27,8 @@ import { useSession } from "next-auth/react"
 
 const navigationItems = [
     {
-      title: "Dashboard",
-      url: "/dashboard", //createPageUrl("Dashboard"),
+      title: "Portal",
+      url: "/portal", //createPageUrl("Portal"),
       icon: LayoutDashboard,
     },
     { title: "Campaigns", url: "/campaigns",icon: CalendarCog },
@@ -41,7 +41,7 @@ const navigationItems = [
       { title: "Settings", url: "/settings",icon: Settings },
   ];
 
-const Layout = async ({ children }:{children:React.ReactNode}) => {
+const Layout = ({ children }:{children:React.ReactNode}) => {
   // const session = await auth();
   const { data: session, update, status } = useSession()
   const pathname = usePathname();

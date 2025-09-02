@@ -24,7 +24,7 @@ export default function LoginPage() {
       if (result?.error) {
         setError("Invalid credentials");
       } else {
-        router.push("/dashboard");
+        router.push("/portal");
       }
     } catch (error) {
       setError("An error occurred during login");
@@ -54,10 +54,10 @@ export default function LoginPage() {
           <button className="w-full bg-black text-white rounded py-2">Sign in</button>
         </form>
         <div className="mt-4 space-y-2">
-          {/* <GoogleSignIn callbackUrl="/dashboard" /> */}
+          {/* <GoogleSignIn callbackUrl="/portal" /> */}
           <button
             className="w-full border rounded py-2"
-            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+            onClick={() => signIn("google", { callbackUrl: "/portal" })}
           >
             Continue with Google
           </button>

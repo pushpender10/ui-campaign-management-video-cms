@@ -3,20 +3,20 @@ import Link from "next/link";
 import { db } from "@/lib/server/database";
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
+import { redirect } from 'next/navigation';
+
+export default async function PortalPage() {
   const session = await auth();
-  if (!session?.user?.email) {
+
+  if (!session?.user?.id) {
     return (
-      <div className="p-6">
-        <p>Not authenticated.</p>
-        <Link href="/login" className="underline">Go to login</Link>
-      </div>
+      redirect('/login')
     );
   }
 
-  const user = await db.user.findByEmail(session.user.email);
+  const user = await db.user.findByEmail(session?.user?.id ?? '');
 
-  const videos = await db.video.findByUserId(user?.id || '');
+  const videos = await db.video.findByUserId(user?.id ?? '');
 
   return (
     <div className="p-6 space-y-4">

@@ -1,7 +1,17 @@
-import PortalHeader from "@/components/PortalHeader";
-import PortalFooter from "@/components/PortalFooter";
+'use client';
+
+import { useSession } from 'next-auth/react';
+import { redirect } from 'next/navigation';
 
 export default function AnalyticsPage() {
+  const { data: session, status } = useSession();
+
+  if (status !== 'authenticated') {
+    return (
+      redirect('/login')
+    )
+  }
+
   return (
     <>
       {/* <PortalHeader /> */}

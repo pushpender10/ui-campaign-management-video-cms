@@ -17,7 +17,7 @@ export default function PortalFooter() {
         <div>
           <h3 className="font-semibold text-white mb-3">Quick Links</h3>
           <ul className="space-y-2">
-            <li><Link href="/dashboard" className="hover:text-white">Dashboard</Link></li>
+            <li><Link href="/portal" className="hover:text-white">Portal</Link></li>
             <li><Link href="/campaigns" className="hover:text-white">Campaigns</Link></li>
             <li><Link href="/analytics" className="hover:text-white">Analytics</Link></li>
             <li><Link href="/settings" className="hover:text-white">Settings</Link></li>
