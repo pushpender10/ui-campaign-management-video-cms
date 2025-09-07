@@ -6,14 +6,15 @@ export const dynamic = "force-dynamic";
 import HlsPlayer from "@/components/HlsPlayer";
 import { auth } from "@/lib/auth";
 
-export default async function VideoDetail({ params }: { params: Promise<{ id: string }> }) {
-
+export default async function VideoDetail({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const session = await auth();
 
   if (!session?.user?.id) {
-    return (
-      redirect('/login')
-    );
+    return redirect("/signin");
   }
 
   const { id } = await params;
@@ -23,11 +24,22 @@ export default async function VideoDetail({ params }: { params: Promise<{ id: st
 
   return (
     <div className="p-6 space-y-4">
-      <Link href="/portal" className="underline">← Back</Link>
+      <Link href="/portal" className="underline">
+        ← Back
+      </Link>
       <h1 className="text-2xl font-semibold">{video.title}</h1>
       <p className="text-gray-600">{video.description}</p>
-      <p className="text-sm text-gray-500">Campaign: {video.campaignStartDate.toISOString().slice(0,10)} → {video.campaignEndDate.toISOString().slice(0,10)}</p>
-      <VideoStatus id={video.id} initial={{ status: video.status, progressPercent: video.progressPercent }} />
+      <p className="text-sm text-gray-500">
+        Campaign: {video.campaignStartDate.toISOString().slice(0, 10)} →{" "}
+        {video.campaignEndDate.toISOString().slice(0, 10)}
+      </p>
+      <VideoStatus
+        id={video.id}
+        initial={{
+          status: video.status,
+          progressPercent: video.progressPercent,
+        }}
+      />
       {canPlay ? (
         <HlsPlayer src={video.hlsManifestPath as string} />
       ) : (
@@ -35,10 +47,10 @@ export default async function VideoDetail({ params }: { params: Promise<{ id: st
       )}
       <form action={`/api/videos/${video.id}`} method="post">
         <input type="hidden" name="_method" value="DELETE" />
-        <button className="border rounded px-3 py-2" formMethod="delete">Delete</button>
+        <button className="border rounded px-3 py-2" formMethod="delete">
+          Delete
+        </button>
       </form>
     </div>
   );
 }
-
-

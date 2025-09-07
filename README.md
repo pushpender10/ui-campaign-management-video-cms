@@ -31,50 +31,59 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deploy
 
-* I scaffolded a new Next.js (App Router) app in video-cms with Tailwind and TypeScript, added Prisma/SQLite, NextAuth (credentials + Google), and built a video upload/transcoding flow with HLS output and status updates.
+- I scaffolded a new Next.js (App Router) app in video-cms with Tailwind and TypeScript, added Prisma/SQLite, NextAuth (credentials + Google), and built a video upload/transcoding flow with HLS output and status updates.
 
 How to run
-* Set Google OAuth envs in ``video-cms/.env:`` <GOOGLE_CLIENT_ID> , <GOOGLE_CLIENT_SECRET> .
-* From video-cms, run:
+
+- Set Google OAuth envs in `video-cms/.env:` <GOOGLE_CLIENT_ID> , <GOOGLE_CLIENT_SECRET> .
+- From video-cms, run:
+
 ```
 npm run dev
 ```
 
-* Visit /register to create a user or /login to sign in (email/username + password or Google).
-* Upload at /upload. After upload, the file is transcoded to HLS; progress is visible on the video page and dashboard. Videos are served from ``/public/videos/{id}/index.m3u8``. Delete from the video page.
+- Visit /register to create a user or /signin to sign in (email/username + password or Google).
+- Upload at /upload. After upload, the file is transcoded to HLS; progress is visible on the video page and dashboard. Videos are served from `/public/videos/{id}/index.m3u8`. Delete from the video page.
 
 What’s implemented
-* Authentication
-    * Credentials login with email or username + password.
-    * Google SSO.
-    * Middleware protects "/dashboard", "/upload", and "/videos/*".
 
-* Database (Prisma + SQLite)
-    * Models: User, Account, Session, VerificationToken, Video with campaignStartDate and campaignEndDate.
+- Authentication
 
-* Upload + delete
-    * API: POST /api/videos accepts multipart form (title, description, campaign dates, file).
-    * API: DELETE /api/videos/[id] removes DB record and public/videos/{id}.
+  - Credentials login with email or username + password.
+  - Google SSO.
+  - Middleware protects "/dashboard", "/upload", and "/videos/\*".
 
-* Transcoding
-    - Background POST to /api/videos/[id]/transcode after upload.
-    - Uses ffmpeg-static to produce HLS into a temp directory, then publishes to public/videos/{id}.
-    - Saves manifest path on the Video and marks status to READY/FAILED.
+- Database (Prisma + SQLite)
 
-* Status updates
-    - SSE endpoint: GET /api/videos/[id]/status.
-    - Client component VideoStatus subscribes and shows status/progress.
+  - Models: User, Account, Session, VerificationToken, Video with campaignStartDate and campaignEndDate.
 
-* Playback
-    - HlsPlayer component with hls.js for non-Safari browsers.
-    - Video detail page uses HlsPlayer.
+- Upload + delete
 
-* Campaign metadata
-    - Upload form collects start/end dates; dashboard and detail pages display them.
+  - API: POST /api/videos accepts multipart form (title, description, campaign dates, file).
+  - API: DELETE /api/videos/[id] removes DB record and public/videos/{id}.
+
+- Transcoding
+
+  - Background POST to /api/videos/[id]/transcode after upload.
+  - Uses ffmpeg-static to produce HLS into a temp directory, then publishes to public/videos/{id}.
+  - Saves manifest path on the Video and marks status to READY/FAILED.
+
+- Status updates
+
+  - SSE endpoint: GET /api/videos/[id]/status.
+  - Client component VideoStatus subscribes and shows status/progress.
+
+- Playback
+
+  - HlsPlayer component with hls.js for non-Safari browsers.
+  - Video detail page uses HlsPlayer.
+
+- Campaign metadata
+  - Upload form collects start/end dates; dashboard and detail pages display them.
 
 Notes
 
-* Update NEXTAUTH_URL in .env if not http://localhost:3000.
-* Default storage folders are created under storage/uploads and storage/transcoded. Final HLS copies to public/videos/{id}.
-* Build is green; lint is skipped during build and generated Prisma files are ignored in lint.
-* Edits included creating the Next.js app; adding Prisma schema; auth setup; API routes for auth, register, videos (POST/GET/DELETE/transcode/status); UI pages (/login, /register, /dashboard, /upload, /videos/[id]); and helper libs (prisma, transcode, HlsPlayer, VideoStatus).
+- Update NEXTAUTH_URL in .env if not http://localhost:3000.
+- Default storage folders are created under storage/uploads and storage/transcoded. Final HLS copies to public/videos/{id}.
+- Build is green; lint is skipped during build and generated Prisma files are ignored in lint.
+- Edits included creating the Next.js app; adding Prisma schema; auth setup; API routes for auth, register, videos (POST/GET/DELETE/transcode/status); UI pages (/signin, /register, /dashboard, /upload, /videos/[id]); and helper libs (prisma, transcode, HlsPlayer, VideoStatus).

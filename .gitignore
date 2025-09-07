@@ -42,4 +42,16 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# VS
+/.vs/slnx.sqlite-journal
+/.vs/slnx.sqlite
+/.vs
+.vscode/generated*
+
+# DB
+dev.db*
+adapter-prisma/prisma/dev.db
+adapter-prisma/prisma/migrations
+db.sqlite
+
 /src/generated/prisma

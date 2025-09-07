@@ -71,6 +71,9 @@ export default function UploadPage() {
 
     try {
       setIsUploading(true);
+
+      const uploadedFileName = Video.uploadfile(file);
+
       const result = await uploadVideo({
         title,
         description,
@@ -113,7 +116,7 @@ export default function UploadPage() {
   }, []);
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0] || null;
     if (file) {
       setFile(file);
       handleFileSelection(file);
@@ -135,7 +138,7 @@ export default function UploadPage() {
 
   const { data: session, status } = useSession();
   if (status !== "authenticated") {
-    return redirect("/login");
+    return redirect("/signin");
   }
 
   return (
@@ -164,11 +167,11 @@ export default function UploadPage() {
             <Card className="bg-gray-900/50 border-gray-800">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
-                  <UploadIcon className="w-5 h-5" />
+                  <UploadIcon className="size-5" />
                   Video File
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex flex-col gap-4">
                 {!file ? (
                   <div
                     className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
@@ -184,13 +187,13 @@ export default function UploadPage() {
                     <VideoIcon className="w-12 h-12 mx-auto mb-4 text-gray-400" />
                     <p className="text-gray-300 mb-2">
                       Drag and drop your video file here, or{" "}
-                      <button
-                        type="button"
+                      <Button
+                        variant="outline"
                         onClick={() => fileInputRef.current?.click()}
-                        className="text-blue-400 hover:text-blue-300 underline"
+                        className="text-blue-600 hover:text-blue-800 underline"
                       >
                         browse
-                      </button>
+                      </Button>
                     </p>
                     <p className="text-sm text-gray-500">
                       Supports MP4, AVI, MOV, WMV, FLV, WebM (Max 500MB)
@@ -204,24 +207,35 @@ export default function UploadPage() {
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center gap-4 p-4 bg-gray-800/50 rounded-lg">
-                    <VideoIcon className="w-8 h-8 text-blue-400" />
-                    <div className="flex-1">
-                      <p className="text-white font-medium">{file.name}</p>
-                      <p className="text-sm text-gray-400">
-                        {(file.size / (1024 * 1024)).toFixed(2)} MB
-                      </p>
+                  <>
+                    <div className="flex items-center gap-4 p-4 bg-gray-800/50 rounded-lg">
+                      <VideoIcon className="w-8 h-8 text-blue-400" />
+                      <div className="flex-1">
+                        <p className="text-white font-medium">{file.name}</p>
+                        <p className="text-sm text-gray-400">
+                          {(file.size / (1024 * 1024)).toFixed(2)} MB
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={removeFile}
+                        className="text-gray-400 hover:text-red-400"
+                      >
+                        <X className="size-4" />
+                      </Button>
                     </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={removeFile}
-                      className="text-gray-400 hover:text-red-400"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
+                    {/* <div className="w-full flex justify-center items-center">
+                      <Button
+                        disabled={isUploading || !file || !title}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        <UploadIcon className="size-5" />
+                        {isUploading ? "Uploading..." : "Upload Video"}
+                      </Button>
+                    </div> */}
+                  </>
                 )}
               </CardContent>
             </Card>
@@ -378,7 +392,7 @@ export default function UploadPage() {
               disabled={isUploading || !file || !title}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              {isUploading ? "Uploading..." : "Upload Video"}
+              {isUploading ? "Saving..." : "Save Details & Upload"}
             </Button>
           </div>
         </form>

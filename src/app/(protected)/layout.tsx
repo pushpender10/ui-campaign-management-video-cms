@@ -8,7 +8,7 @@ import {
   Upload,
   LayoutDashboard,
   User,
-  Search,
+  // Search,
   Settings,
   CalendarCog,
   ChartArea,
@@ -27,8 +27,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { title } from "process";
+// import { Button } from "@/components/ui/button";
+// import { title } from "process";
 import { useSession } from "next-auth/react";
 // import { auth } from "@/lib/auth";
 // import { User as UserEntity } from "@/entities/User";
@@ -51,21 +51,20 @@ const navigationItems = [
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   // const session = await auth();
-  const { data: session, update, status } = useSession();
+  const { data: session } = useSession();
   const pathname = usePathname();
-  const [user, setUser] = React.useState(null);
 
   //To do: will correct user later.
-
-  React.useEffect(() => {
-    const loadUser = async () => {
-      const currentUser = session?.user;
-      if (currentUser) {
-        setUser(currentUser as any);
-      }
-    };
-    loadUser();
-  }, []);
+  // const [user, setUser] = React.useState(null);
+  // React.useEffect(() => {
+  //   const loadUser = async () => {
+  //     const currentUser = session?.user;
+  //     if (currentUser) {
+  //       setUser(currentUser as any);
+  //     }
+  //   };
+  //   loadUser();
+  // }, [session?.user]);
 
   return (
     <div className="min-h-screen bg-gray-950">

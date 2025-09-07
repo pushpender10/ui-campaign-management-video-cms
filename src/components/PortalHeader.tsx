@@ -32,6 +32,8 @@ export default function PortalHeader() {
   // const session = await auth();
   const { data: session, update, status } = useSession();
   // console.log(session?.user);
+  // console.log("update fn:", update);
+  // console.log("Session status:", status);
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">
@@ -64,7 +66,7 @@ export default function PortalHeader() {
             <>
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                  <div className="size-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                     <User className="w-5 h-5 text-white" />
                   </div>
                 </DropdownMenuTrigger>
@@ -98,7 +100,7 @@ export default function PortalHeader() {
             </>
           ) : (
             <>
-              <Link href="/login">
+              <Link href="/signin">
                 <Button>Sign In</Button>
               </Link>
               {/* <Button>Sign Up</Button> */}
@@ -137,7 +139,7 @@ export default function PortalHeader() {
               </>
             ) : (
               <>
-                <Link href="/login">
+                <Link href="/signin">
                   <Button>Sign In</Button>
                 </Link>
               </>

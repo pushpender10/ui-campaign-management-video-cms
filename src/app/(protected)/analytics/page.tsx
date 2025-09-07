@@ -7,7 +7,7 @@ export default function AnalyticsPage() {
   const { data: session, status } = useSession();
 
   if (status !== "authenticated") {
-    return redirect("/login");
+    return redirect("/signin");
   }
 
   return (

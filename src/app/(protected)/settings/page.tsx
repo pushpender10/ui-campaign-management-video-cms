@@ -9,7 +9,7 @@ import { redirect } from "next/navigation";
 export default function SettingsPage() {
   const { data: session, status } = useSession();
   if (status !== "authenticated") {
-    return redirect("/login");
+    return redirect("/signin");
   }
   return (
     <>
