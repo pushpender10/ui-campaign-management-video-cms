@@ -7,6 +7,21 @@ import { prisma } from "./database";
 import { comparePassword } from "@/lib/shared/password";
 // import { email } from "zod";
 
+declare module "next-auth" {
+  interface Session {
+    error?: "RefreshTokenError";
+  }
+}
+
+declare module "next-auth" {
+  interface JWT {
+    access_token: string;
+    expires_at: number | null;
+    refresh_token?: string;
+    error?: "RefreshTokenError";
+  }
+}
+
 export const authOptions: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
   session: {
@@ -26,7 +41,7 @@ export const authOptions: NextAuthConfig = {
         identifier: { label: "User identifier", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials: any) {
+      async authorize(credentials) {
         if (!credentials?.identifier || !credentials?.password) {
           return null;
         }
@@ -49,7 +64,7 @@ export const authOptions: NextAuthConfig = {
         }
 
         const isValidPassword = await comparePassword(
-          credentials.password,
+          credentials.password as string,
           user.passwordHash as string
         );
 
@@ -66,7 +81,7 @@ export const authOptions: NextAuthConfig = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user, account, trigger, session }: any) {
+    async jwt({ token, user, account, trigger, session }) {
       if (user) {
         token.user = user;
         token.id = user.id;
@@ -133,7 +148,7 @@ export const authOptions: NextAuthConfig = {
         return token;
       }
     },
-    async session({ session, token }: any) {
+    async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string;
         (session.user as any).username = (token as any).username as string;
