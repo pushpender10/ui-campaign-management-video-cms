@@ -94,6 +94,8 @@ export const authOptions: NextAuthConfig = {
       }
 
       if (account) {
+         // Persist the OAuth access_token to the token right after signin
+         token.accessToken = account.access_token
         return {
           ...token,
           access_token: account.access_token,
@@ -150,6 +152,9 @@ export const authOptions: NextAuthConfig = {
     },
     async session({ session, token }) {
       if (token) {
+        // Send properties to the client, like an access_token from a provider.
+        (session as any).accessToken = (token as any).access_token;
+        
         session.user.id = token.id as string;
         (session.user as any).username = (token as any).username as string;
       }

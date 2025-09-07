@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { redirect, useRouter } from "next/navigation";
+import { useSession, signIn } from "next-auth/react";
 import {
   Card,
   CardContent,
@@ -18,6 +18,11 @@ export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  const { data: session, status } = useSession();
+  if (status === "authenticated") {
+    return redirect("/");
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,6 +49,7 @@ export default function LoginPage() {
       setError("An error occurred during login");
     }
   }
+
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
