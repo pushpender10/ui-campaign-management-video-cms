@@ -4,13 +4,17 @@ import { useSession } from "next-auth/react";
 // import PortalHeader from "@/components/PortalHeader";
 // import PortalFooter from "@/components/PortalFooter";
 
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function SettingsPage() {
+  const router = useRouter();
   const { data: session, status } = useSession();
-  if (status !== "authenticated") {
-    return redirect("/signin");
-  }
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/signin");
+    }
+  }, [status, router]);
   return (
     <>
       {/* <PortalHeader /> */}

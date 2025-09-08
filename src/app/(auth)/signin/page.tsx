@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { redirect, useRouter } from "next/navigation";
+import { useEffect, useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { useSession, signIn } from "next-auth/react";
 import {
   Card,
@@ -20,11 +20,13 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   const { data: session, status } = useSession();
-  if (status === "authenticated") {
-    return redirect("/");
-  }
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/");
+    }
+  }, [status, router]);
 
-  async function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
 

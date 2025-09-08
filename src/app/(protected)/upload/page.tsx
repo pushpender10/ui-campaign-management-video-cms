@@ -1,5 +1,5 @@
 "use client";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,7 @@ import {
 } from "@/lib/shared/constants";
 import { validateVideoFile } from "@/lib/client/utils";
 import { useSession } from "next-auth/react";
+import { Video } from "@/entities/Video";
 
 export default function UploadPage() {
   const router = useRouter();
@@ -137,9 +138,11 @@ export default function UploadPage() {
   };
 
   const { data: session, status } = useSession();
-  if (status !== "authenticated") {
-    return redirect("/signin");
-  }
+  React.useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/signin");
+    }
+  }, [status, router]);
 
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6">
