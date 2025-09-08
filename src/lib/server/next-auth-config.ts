@@ -1,8 +1,9 @@
 import type { NextAuthConfig } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import type { Adapter } from "@auth/core/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
-
+import { OAuth2Client } from "google-auth-library";
 import { prisma } from "./database";
 import { comparePassword } from "@/lib/shared/password";
 // import { email } from "zod";
@@ -22,8 +23,12 @@ declare module "next-auth" {
   }
 }
 
+const googleAuthClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID!);
+
+export const adapter: Adapter = PrismaAdapter(prisma);
+
 export const authOptions: NextAuthConfig = {
-  adapter: PrismaAdapter(prisma),
+  adapter: adapter,
   session: {
     strategy: "jwt",
   },
@@ -40,11 +45,121 @@ export const authOptions: NextAuthConfig = {
       credentials: {
         identifier: { label: "User identifier", type: "text" },
         password: { label: "Password", type: "password" },
+        // Support Google One Tap via ID token through the same provider
+        idToken: { label: "Google One Tap ID Token", type: "text" },
+        googleOneTap: { label: "Google One Tap flag", type: "text" },
       },
       async authorize(credentials) {
+        console.log("CredentialsProvider authorize", {
+          hasIdentifier: !!credentials?.identifier,
+          hasPassword: !!credentials?.password,
+          hasIdToken: !!(credentials as any)?.idToken,
+        });
+
+        // 1) Google One Tap path (ID token based)
+        const idToken = (credentials as any)?.idToken as string | undefined;
+        if (idToken) {
+          try {
+            const ticket = await googleAuthClient.verifyIdToken({
+              idToken,
+              audience: process.env.GOOGLE_CLIENT_ID!,
+            });
+            const payload = ticket.getPayload();
+            if (!payload || !payload.email) {
+              console.warn("One Tap: missing payload or email");
+              return null;
+            }
+
+            // const email = String(payload.email).toLowerCase().trim();
+            // const name = payload.name ?? null;
+            // const image = payload.picture ?? null;
+
+            const {
+              email,
+              sub,
+              given_name,
+              family_name,
+              picture: image,
+              email_verified,
+            } = payload;
+            if (!email) {
+              throw new Error("Email not available");
+            }
+
+            // Find or create the user by email
+            let user = await prisma.user.findUnique({ where: { email } });
+            if (!user) {
+              // Generate a username from email local part, ensure uniqueness
+              const baseUsername = email
+                .split("@")[0]
+                .toLowerCase()
+                .replace(/[^a-z0-9_]/g, "_");
+              const tryUsernames = [
+                baseUsername,
+                `${baseUsername}_1`,
+                `${baseUsername}_${Math.random().toString(36).slice(2, 6)}`,
+              ];
+              let finalUsername: string | null = null;
+              for (const candidate of tryUsernames) {
+                const existing = await prisma.user.findUnique({
+                  where: { username: candidate },
+                });
+                if (!existing) {
+                  finalUsername = candidate;
+                  break;
+                }
+              }
+
+              user = await prisma.user.create({
+                data: {
+                  email,
+                  name: [given_name, family_name].join(" ") ?? undefined,
+                  image: image ?? undefined,
+                  emailVerified: email_verified ? new Date() : null,
+                  username: finalUsername ?? undefined,
+                },
+              });
+            }
+
+            // The user may already exist, but maybe it signed up with a different provider. With the next few lines of code
+            // we check if the user already had a Google account associated, and if not we create one.
+            const account = await adapter.getUserByAccount!({
+              provider: "google",
+              providerAccountId: sub,
+            });
+
+            console.log("todo: linkAccount?", { userId: user.id, account });
+
+            if (!account && user) {
+              console.log("creating and linking account");
+              await adapter.linkAccount!({
+                userId: user.id,
+                provider: "google",
+                providerAccountId: sub,
+                type: "oauth",
+              });
+            }
+
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              username: (user as any).username,
+            };
+          } catch (err) {
+            console.error("One Tap verifyIdToken failed", err);
+            return null;
+          }
+        }
+
+        // 2) Traditional credentials path
+        console.log("CredentialsProvider password flow");
         if (!credentials?.identifier || !credentials?.password) {
           return null;
         }
+
+        const identifier = String(credentials.identifier).toLowerCase().trim();
+        const password = String(credentials.password);
 
         // const user = await prisma.user.findUnique({
         //   where: { username: credentials.username },
@@ -52,23 +167,27 @@ export const authOptions: NextAuthConfig = {
 
         const user = await prisma.user.findFirst({
           where: {
-            OR: [
-              { username: credentials.identifier },
-              { email: credentials.identifier },
-            ],
+            OR: [{ username: identifier }, { email: identifier }],
           },
         });
 
         if (!user || !user.passwordHash) {
+          console.warn(
+            "CredentialsProvider: user not found or missing passwordHash",
+            { identifier }
+          );
           return null;
         }
 
         const isValidPassword = await comparePassword(
-          credentials.password as string,
+          password,
           user.passwordHash as string
         );
 
         if (!isValidPassword) {
+          console.warn("CredentialsProvider: invalid password", {
+            userId: user.id,
+          });
           return null;
         }
         return {

@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "@/app/styles/app.css";
+import Script from "next/script";
 
 import { NextAuthProvider } from "@/components/NextAuthProvider";
+import GoogleOneTap from "@/components/GoogleOneTap";
 // import { auth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -32,11 +34,18 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <Script src="https://accounts.google.com/gsi/client" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextAuthProvider>
-          <div className="mx-auto">{children}</div>
+          <div className="mx-auto">
+            {/* Todo: enable one tap sign in after resolving issues */}
+            {/* <GoogleOneTap /> */}
+            {children}
+          </div>
         </NextAuthProvider>
       </body>
     </html>

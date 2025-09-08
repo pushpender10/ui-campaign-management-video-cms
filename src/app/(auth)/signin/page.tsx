@@ -22,7 +22,7 @@ export default function LoginPage() {
   const { data: session, status } = useSession();
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace("/");
+      router.replace("/portal");
     }
   }, [status, router]);
 
@@ -51,7 +51,6 @@ export default function LoginPage() {
       setError("An error occurred during login");
     }
   }
-
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

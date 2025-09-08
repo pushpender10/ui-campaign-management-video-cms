@@ -9,7 +9,13 @@ export async function POST(req: Request) {
   if (!parsed.success)
     return NextResponse.json({ error: "Invalid body" }, { status: 400 });
   const { name, email, username, password } = parsed.data;
-  const existing = await db.user.findByEmailOrUsername(email, username);
+  // Normalize on server to avoid casing mismatches
+  const normalizedEmail = email.toLowerCase().trim();
+  const normalizedUsername = username.toLowerCase().trim();
+  const existing = await db.user.findByEmailOrUsername(
+    normalizedEmail,
+    normalizedUsername
+  );
   if (existing)
     return NextResponse.json({ error: "User exists" }, { status: 409 });
 
@@ -21,7 +27,12 @@ export async function POST(req: Request) {
     );
   }
 
-  const user = await db.user.create({ name, email, username, passwordHash });
+  const user = await db.user.create({
+    name,
+    email: normalizedEmail,
+    username: normalizedUsername,
+    passwordHash,
+  });
 
   return NextResponse.json({ id: user.id });
 }

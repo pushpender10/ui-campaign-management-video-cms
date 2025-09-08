@@ -2,7 +2,7 @@
 import { signIn, signOut, auth } from "@/lib/auth";
 import { AuthError } from "next-auth";
 
-export async function googleAuthenticate(callbackUrl: string) {
+export async function googleAuthenticate(callbackRedirectUrl: string) {
   // Ensure no existing session is active to avoid account linking conflicts
   const session = await auth();
   if (session?.user) {
@@ -14,7 +14,7 @@ export async function googleAuthenticate(callbackUrl: string) {
   }
 
   try {
-    await signIn("google", { callbackUrl });
+    await signIn("google", { redirectTo: callbackRedirectUrl });
   } catch (error) {
     if (error instanceof AuthError) {
       if (error.type === "OAuthAccountNotLinked") {
@@ -22,7 +22,7 @@ export async function googleAuthenticate(callbackUrl: string) {
         try {
           await signOut({ redirect: false });
         } catch {}
-        await signIn("google", { callbackUrl });
+        await signIn("google", { redirectTo: callbackRedirectUrl });
         return;
       }
       return "google log in failed";
