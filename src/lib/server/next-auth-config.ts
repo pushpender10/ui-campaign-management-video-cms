@@ -82,6 +82,8 @@ export const authOptions: NextAuthConfig = {
   ],
   callbacks: {
     async jwt({ token, user, account, trigger, session }) {
+      // console.log("JWT callback: ", { token, user, account, trigger, session });
+      // Initial sign in
       if (user) {
         token.user = user;
         token.id = user.id;
@@ -94,17 +96,18 @@ export const authOptions: NextAuthConfig = {
       }
 
       if (account) {
-         // Persist the OAuth access_token to the token right after signin
-         token.accessToken = account.access_token
         return {
           ...token,
+
+          // Persist the OAuth access_token to the token right after signin
           access_token: account.access_token,
-          expires_at: account.expires_at ?? null,
           refresh_token: account.refresh_token ?? token.refresh_token,
+          expires_at: account.expires_at ?? null,
         };
       }
 
-      const expiresAt = typeof token.expires_at === "number" ? token.expires_at : null;
+      const expiresAt =
+        typeof token.expires_at === "number" ? token.expires_at : null;
       if (!expiresAt) {
         return token;
       }
@@ -142,7 +145,9 @@ export const authOptions: NextAuthConfig = {
           ...token,
           access_token: newTokens.access_token,
           expires_at: Math.floor(Date.now() / 1000 + newTokens.expires_in),
-          refresh_token: newTokens.refresh_token ? newTokens.refresh_token : token.refresh_token,
+          refresh_token: newTokens.refresh_token
+            ? newTokens.refresh_token
+            : token.refresh_token,
         };
       } catch (error) {
         console.error("Error refreshing access_token", error);
@@ -154,7 +159,7 @@ export const authOptions: NextAuthConfig = {
       if (token) {
         // Send properties to the client, like an access_token from a provider.
         (session as any).accessToken = (token as any).access_token;
-        
+
         session.user.id = token.id as string;
         (session.user as any).username = (token as any).username as string;
       }
