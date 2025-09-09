@@ -6,6 +6,7 @@ import Google from "next-auth/providers/google";
 import { OAuth2Client } from "google-auth-library";
 import { prisma } from "./database";
 import { comparePassword } from "@/lib/shared/password";
+// import Nodemailer from "next-auth/providers/nodemailer";
 // import { email } from "zod";
 
 declare module "next-auth" {
@@ -33,6 +34,10 @@ export const authOptions: NextAuthConfig = {
     strategy: "jwt",
   },
   providers: [
+    // Nodemailer({
+    //   server: process.env.EMAIL_SERVER,
+    //   from: process.env.EMAIL_FROM,
+    // }),
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
@@ -200,6 +205,26 @@ export const authOptions: NextAuthConfig = {
     }),
   ],
   callbacks: {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === "google") {
+        try {
+          console.log("user:", user, "\naccount:", account);
+          return true;
+        } catch (error) {
+          console.error("Error during OAuth login:", error);
+          return false;
+        }
+      }
+      return true;
+      /*
+      if (account?.provider === "google") {
+        return profile?.email_verified && profile?.email?.endsWith("@gmail.com")
+          ? true
+          : false;
+      }
+      return true; // Do different verification for other providers that don't have `email_verified`
+      */
+    },
     async jwt({ token, user, account, trigger, session }) {
       // console.log("JWT callback: ", { token, user, account, trigger, session });
       // Initial sign in
