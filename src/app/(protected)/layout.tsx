@@ -5,13 +5,13 @@ import { usePathname } from "next/navigation";
 // import { createPageUrl } from "@/lib/utils";
 import {
   Video,
-  Upload,
-  LayoutDashboard,
+  // Upload,
+  // LayoutDashboard,
   User,
   // Search,
-  Settings,
-  CalendarCog,
-  ChartArea,
+  // Settings,
+  // CalendarCog,
+  // ChartArea,
 } from "lucide-react";
 import {
   Sidebar,
@@ -30,24 +30,21 @@ import {
 // import { Button } from "@/components/ui/button";
 // import { title } from "process";
 import { useSession } from "next-auth/react";
+import { navigationItems } from "@/lib/shared/nav-links";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  SignOutButton,
+  UserProfileButton,
+} from "@/components/NavSpecialButtons";
 // import { auth } from "@/lib/auth";
 // import { User as UserEntity } from "@/entities/User";
-
-const navigationItems = [
-  {
-    title: "Portal",
-    url: "/portal", //createPageUrl("Portal"),
-    icon: LayoutDashboard,
-  },
-  { title: "Campaigns", url: "/campaigns", icon: CalendarCog },
-  {
-    title: "Upload Video",
-    url: "/upload", //createPageUrl("Upload"),
-    icon: Upload,
-  },
-  { title: "Analytics", url: "/analytics", icon: ChartArea },
-  { title: "Settings", url: "/settings", icon: Settings },
-];
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   // const session = await auth();
@@ -125,17 +122,33 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
             <SidebarFooter className="border-t border-blue-500/50 p-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-white text-sm truncate">
-                    {session?.user?.name || "User"}
-                  </p>
-                  <p className="text-xs text-gray-400 truncate">
-                    Content Creator
-                  </p>
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <div className="flex items-center gap-3 cursor-pointer">
+                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <User className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-white text-sm truncate">
+                          {session?.user?.name || "User"}
+                        </p>
+                        <p className="text-xs text-gray-400 truncate">
+                          Content Creator
+                        </p>
+                      </div>
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="top">
+                    <DropdownMenuLabel>Admin</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <UserProfileButton />
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <SignOutButton />
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </SidebarFooter>
           </Sidebar>
