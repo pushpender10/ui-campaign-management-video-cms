@@ -4,8 +4,9 @@ export const dynamic = "force-dynamic";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Video, BarChart3, Users } from "lucide-react";
+import generateBlurDataURL from "@/lib/client/generateBlurData";
 
-export default function Home() {
+export default async function Home() {
   return (
     // <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
     <>
@@ -24,9 +25,12 @@ export default function Home() {
           <div className="relative w-full h-64 md:h-96 rounded-2xl overflow-hidden shadow-md">
             <Image
               src="/preview.jpg"
-              alt="Video CMS preview"
+              alt="preview image"
               fill
               className="object-cover"
+              loading="lazy"
+              placeholder="blur"
+              blurDataURL={await generateBlurDataURL("/preview.jpg")}
             />
           </div>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">

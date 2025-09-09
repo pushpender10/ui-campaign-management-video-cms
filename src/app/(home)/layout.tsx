@@ -9,10 +9,8 @@ export default async function HomeLayout({
   return (
     <>
       <PortalHeader />
-        <main className="mx-auto">
-          {children}
-        </main>
-        <PortalFooter />
-      </>
+      <div className="mx-auto">{children}</div>
+      <PortalFooter />
+    </>
   );
 }
